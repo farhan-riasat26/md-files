@@ -1,4 +1,4 @@
-# FastApi Project Setup
+# Flask Project Setup
 
 -   Set Time and TimeZone
 
@@ -21,7 +21,7 @@
 
 -   Create variables
     ```bash
-    CUS_LOGS=/var/log/custom_logs && APP_NAME=fastapi.devops.com && APP_DIR=/var/python/fastapi/${APP_NAME}
+    CUS_LOGS=/var/log/custom_logs && APP_NAME=flask.devops.com && APP_DIR=/var/python/flask/${APP_NAME}
     ```
 
 ## Logging
@@ -52,27 +52,27 @@ apt install build-essential {libssl,libffi}-dev nginx python3 python3-{pip,dev,v
 
 ## Services Setup
 
--   Add scripts to Reload and Restart **Nginx** and **fastapi.devops.com**.
+-   Add scripts to Reload and Restart **Nginx** and **flask.devops.com**.
 
     ```bash
     echo '#!/bin/bash
     systemctl reload '${APP_NAME}'.service; systemctl status '${APP_NAME}'.service --no-pager;
     printf "%*s\n" "${COLUMNS:-$(tput cols)}" "" | tr " " -;
     systemctl reload nginx.service; systemctl status nginx.service --no-pager;
-    ' | tee /usr/local/bin/reload-server.sh >/dev/null &&
-    chmod +x /usr/local/bin/reload-server.sh;\
+    ' | tee /usr/local/bin/reload-flask-server.sh >/dev/null &&
+    chmod +x /usr/local/bin/reload-flask-server.sh;\
     echo '#!/bin/bash
     systemctl restart '${APP_NAME}'.service; systemctl status '${APP_NAME}'.service --no-pager;
     printf "%*s\n" "${COLUMNS:-$(tput cols)}" "" | tr " " -;
     systemctl restart nginx.service; systemctl status nginx.service --no-pager;
-    ' | tee /usr/local/bin/restart-server.sh >/dev/null &&
-    chmod +x /usr/local/bin/restart-server.sh
+    ' | tee /usr/local/bin/restart-flask-server.sh >/dev/null &&
+    chmod +x /usr/local/bin/restart-flask-server.sh
     ```
 
     -   Confirm changes.
 
         ```bash
-        nano /usr/local/bin/re{load,start}-server.sh
+        nano /usr/local/bin/re{load,start}-flask-server.sh
         ```
 
 ## Prepare and Activate Python Virtual Environment
@@ -87,35 +87,40 @@ mkdir -p ${APP_DIR} && mkdir -p ${APP_DIR}/log && cd ${APP_DIR} && python3 -m ve
     ```
 -   Install necessary packages
     ```
-    pip install fastapi[all] gunicorn
+    pip install flask gunicorn uvicorn python-dotenv
     ```
+
 - Create main.py
     ```bash
-    echo "
-    from flask import Flask
-    import uvicorn
+    echo "from flask import Flask, request
 
     app = Flask(__name__)
 
-
     @app.route('/')
-    async def hello_world():  # put application's code here
-    return 'Hello World!'
-
+    def hello_world():  # put application's code here
+        return 'Hello World!'
 
     if __name__ == '__main__':
-    uvicorn.run(
-        'main:app',
-        host='0.0.0.0',
-        port=8080,
-        reload=True
-    )" | tee ${APP_DIR}/main.py >/dev/null
+        app.run(debug=True)
+    " | tee ${APP_DIR}/main.py >/dev/null
     ```
+    -   Confirm changes.
+
+        ```bash
+        nano ${APP_DIR}/main.py
+        ```
 
 -   .env file
+
     ```bash
-    APP_DOMAIN=${APP_NAME}
+    echo "APP_DOMAIN="${APP_NAME}"" | tee ${APP_DIR}/.env >/dev/null
     ```
+
+    -   Confirm changes.
+
+        ```bash
+        nano ${APP_DIR}/.env
+        ```
 
 -   Make a service file
     ```bash
@@ -157,7 +162,7 @@ mkdir -p ${APP_DIR} && mkdir -p ${APP_DIR}/log && cd ${APP_DIR} && python3 -m ve
     accesslog = f'/var/log/custom_logs/{APP_DOMAIN}-gunicorn-access.log'
     errorlog = f'/var/log/custom_logs/{APP_DOMAIN}-gunicorn-error.log'
     # Socket Path
-    bind = f'unix:/var/python/fastapi/{APP_DOMAIN}/{APP_DOMAIN}.sock'
+    bind = f'unix:/var/python/flask/{APP_DOMAIN}/{APP_DOMAIN}.sock'
 
     # Worker Options
     workers = 2*cpu_count() + 1
@@ -174,8 +179,7 @@ mkdir -p ${APP_DIR} && mkdir -p ${APP_DIR}/log && cd ${APP_DIR} && python3 -m ve
     raw_env = ['TOKENIZERS_PARALLELISM=False']
     capture_output = True
     worker_tmp_dir = os.path.join(wdir,'log')
-    reload = True
-    " | tee ${APP_DIR}/gunicorn_conf.py >/dev/null
+    reload = True" | tee ${APP_DIR}/gunicorn_conf.py >/dev/null
     ```
 
 - Confirm Changes
@@ -190,12 +194,10 @@ mkdir -p ${APP_DIR} && mkdir -p ${APP_DIR}/log && cd ${APP_DIR} && python3 -m ve
         ```bash
         ll ${CUS_LOGS}/${APP_NAME}-gunicorn-*
         ```
-
 - Change Owner Ship
     ```bash
     chown -R www-data:www-data ${APP_DIR}
     ```
-
 - Start and Enable Gunicorn service.
     ```bash
     systemctl start ${APP_NAME}.service && systemctl enable ${APP_NAME}.service && systemctl status ${APP_NAME}.service
@@ -368,4 +370,4 @@ mkdir -p ${APP_DIR} && mkdir -p ${APP_DIR}/log && cd ${APP_DIR} && python3 -m ve
 - https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-20-04
 - https://www.digitalocean.com/community/tutorials/how-to-install-python-3-and-set-up-a-programming-environment-on-an-ubuntu-20-04-server
 - https://www.uvicorn.org/deployment/#running-behind-nginx
-- https://www.vultr.com/docs/how-to-deploy-fastapi-applications-with-gunicorn-and-nginx-on-ubuntu-20-04/
+- https://www.vultr.com/docs/how-to-deploy-flask-applications-with-gunicorn-and-nginx-on-ubuntu-20-04/
