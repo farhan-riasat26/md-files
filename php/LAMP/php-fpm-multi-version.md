@@ -1,4 +1,4 @@
-# PHP-FPM LAMP STACK
+# PHP-FPM Multi version LAMP STACK
 - Set Time and TimeZone
     ```bash
     timedatectl set-timezone Asia/Karachi &&
@@ -7,10 +7,12 @@
     timedatectl set-ntp true
     ```
 - variables
+
     ```bash
-    PHP_VERSION=7.2
+    PHP_VERSIONS=("7.2" "7.3" "7.4" "8.0" "8.1")
     ```
 - update the OS
+
     ```bash
     apt update && apt full-upgrade -y
     ```
@@ -48,13 +50,94 @@
 - Installation of php-fpm along some PHP Extensions
 
     ```bash
-    apt install php${PHP_VERSION} php${PHP_VERSION}-{bcmath,cli,common,curl,imagick,imap,intl,fpm,gd,json,ldap,mbstring,mysql,opcache,pdo,tidy,xml,xmlrpc,zip}
+    apt install php{7.{2,4},8.{0,1,2,3}}{,-{bcmath,cli,common,curl,imagick,imap,intl,fpm,gd,ldap,mbstring,mysql,opcache,pdo,tidy,xml,xmlrpc,zip}} php7.{2,4}-json
     ```
-
 - To enable PHP FPM mod-conf enable
 
     ```bash
-    a2enmod proxy_fcgi setenvif && a2enconf php7.2-fpm && systemctl restart apache2
+    a2enmod proxy_fcgi setenvif && a2enconf php{7.{2,4},8.{0,1,2,3}}-fpm && systemctl restart apache2
+    - For enable /ping and /status /realtime-status
+
+    ```bash
+    sed -i 's/;ping.path/ping.path/; s/;pm.status_path/pm.status_path/; s/^pm\.start_servers = .*/pm.start_servers = 10/; s/^pm\.min_spare_servers = .*/pm.min_spare_servers = 7/; s/^pm\.max_spare_servers = .*/pm.max_spare_servers = 10/' /etc/php/${PHP_VERSION}/fpm/pool.d/www.conf
+    ```
+
+## Services Setup
+- Add scripts to Reload and Restart Apache2 PHP-FPM
+
+    ```bash
+    echo '#!/bin/bash
+
+    # Restart Apache2
+    systemctl reload apache2
+    systemctl status apache2
+    printf "%*s\n" "${COLUMNS:-$(tput cols)}" "" | tr " " -;
+    # reload PHP'${PHP_VERSION}'-FPM
+    systemctl reload php'${PHP_VERSION}'-fpm
+    systemctl status php'${PHP_VERSION}'-fpm
+    ' | tee "/usr/local/bin/reload-services.sh" >/dev/null && chmod +x "/usr/local/bin/reload-services.sh"
+
+    echo '#!/bin/bash
+
+    # Restart Apache2
+    systemctl restart apache2
+    systemctl status apache2
+    printf "%*s\n" "${COLUMNS:-$(tput cols)}" "" | tr " " -;
+    # Restart PHP'${PHP_VERSION}'-FPM
+    systemctl restart php'${PHP_VERSION}'-fpm
+    systemctl status php'${PHP_VERSION}'-fpm
+    ' | tee "/usr/local/bin/restart-services.sh" >/dev/null && chmod +x "/usr/local/bin/restart-services.sh"
+    ```
+    - Confirm changes.
+
+        ```bash
+        nano /usr/local/bin/re{load,start}-services.sh
+        ```
+## Install phpmyadmin
+```bash
+add-apt-repository ppa:phpmyadmin/ppa && apt update && apt install phpmyadmin
+```
+
+# Set Virtual Host For Another Site
+## Setup files
+  - Variable
+    ```bash
+    SITE_NAME=first.com
+    ```
+  - Make Dir for the Web and set permission
+    ```bash
+    mkdir -p /var/www/${SITE_NAME}/public_html && chown -R www-data:www-data /var/www/${SITE_NAME}/public_html && echo '<html>
+    <head>
+        <title>Welcome to '${SITE_NAME}'</title>
+    </head>
+    <body>
+        <h1>Success! The '${SITE_NAME}' virtual host is working!</h1>
+    </body>
+    </html>
+    ' | tee /var/www/${SITE_NAME}/public_html/index.html >/dev/null
+    ```
+
+  - Make Conf file
+
+    ```bash
+    echo '<VirtualHost *:80>
+    ServerAdmin admin@'${SITE_NAME}'
+    ServerName '${SITE_NAME}'
+    ServerAlias www.'${SITE_NAME}'
+    DocumentRoot /var/www/'${SITE_NAME}'/public_html
+
+    ErrorLog /var/log/custom_logs/'${SITE_NAME}'-error.log
+    CustomLog /var/log/custom_logs/'${SITE_NAME}'-access.log combined
+    </VirtualHost>
+    ' | tee /etc/apache2/sites-available/${SITE_NAME} >/dev/null
+    ```
+
+  - Restart services
+
+    ```bash
+    a2ensite ${SITE_NAME}.conf && restart-services.sh
+    ```
+
     ```
 
 - Ensure version
@@ -173,10 +256,6 @@
         ```bash
         nano /usr/local/bin/re{load,start}-services.sh
         ```
-
-
-
-
 ## Install phpmyadmin
 ```bash
 add-apt-repository ppa:phpmyadmin/ppa && apt update && apt install phpmyadmin
@@ -221,5 +300,4 @@ add-apt-repository ppa:phpmyadmin/ppa && apt update && apt install phpmyadmin
     ```bash
     a2ensite ${SITE_NAME}.conf && restart-services.sh
     ```
-
 

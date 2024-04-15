@@ -92,10 +92,10 @@ mkdir -p ${APP_DIR} && mkdir -p ${APP_DIR}/log && cd ${APP_DIR} && python3 -m ve
 - Create main.py
     ```bash
     echo "
-    from flask import Flask
     import uvicorn
+    from fastapi import FastAPI
 
-    app = Flask(__name__)
+    app = FastAPI()
 
 
     @app.route('/')
