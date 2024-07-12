@@ -21,7 +21,7 @@
 
 -   Create variables
     ```bash
-    CUS_LOGS=/var/log/custom_logs && APP_NAME=fastapi.devops.com && APP_DIR=/var/python/fastapi/${APP_NAME}
+    CUS_LOGS=/var/log/custom_logs && APP_NAME=abc.com && APP_DIR=/var/python/fastapi/${APP_NAME}
     ```
 
 ## Logging
@@ -59,14 +59,14 @@ apt install build-essential {libssl,libffi}-dev nginx python3 python3-{pip,dev,v
     systemctl reload '${APP_NAME}'.service; systemctl status '${APP_NAME}'.service --no-pager;
     printf "%*s\n" "${COLUMNS:-$(tput cols)}" "" | tr " " -;
     systemctl reload nginx.service; systemctl status nginx.service --no-pager;
-    ' | tee /usr/local/bin/reload-server.sh >/dev/null &&
-    chmod +x /usr/local/bin/reload-server.sh;\
+    ' | tee /usr/local/bin/reload-abc.sh >/dev/null &&
+    chmod +x /usr/local/bin/reload-abc.sh;\
     echo '#!/bin/bash
     systemctl restart '${APP_NAME}'.service; systemctl status '${APP_NAME}'.service --no-pager;
     printf "%*s\n" "${COLUMNS:-$(tput cols)}" "" | tr " " -;
     systemctl restart nginx.service; systemctl status nginx.service --no-pager;
-    ' | tee /usr/local/bin/restart-server.sh >/dev/null &&
-    chmod +x /usr/local/bin/restart-server.sh
+    ' | tee /usr/local/bin/restart-abc.sh >/dev/null &&
+    chmod +x /usr/local/bin/restart-abc.sh
     ```
 
     -   Confirm changes.
