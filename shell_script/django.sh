@@ -76,7 +76,7 @@ WantedBy=sockets.target
 ' | tee /etc/systemd/system/${APP_NAME}.socket >/dev/null
 
 # Make a service file
-echo "Make a service file..."
+echo "Make a service file..."d
 
 echo '
 [Unit]
