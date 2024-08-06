@@ -1,4 +1,5 @@
-# Prerequisites of windows installation
+# Windows Setup
+## Prerequisites of windows installation
 - Windows 10 or later
 - 64-bit processor
 - Partition scheme: GPT `diskpart` `list disk`
@@ -65,7 +66,7 @@
 
         ![key-save.png](../image/putty/save-private-key-linux.png)
 
-    - Save Public key copy the selected area text and save it with the name if extension `.id_rsa.pub`
+    - Save Public key copy the selected area text and save it with the name and its extension `.id_rsa.pub`
 
         ![public-key.png](../image/putty/save-public-key.png)
 
@@ -103,10 +104,19 @@
     - from next option select `Generation 1`
     - Then assign memory for now don't make any change we will setup this on later on
     - From configuring Network select option as you named it.
+    - Now select the size of Hard Disk at least `100`GB
+    - And then select the ISO file of `ubuntu-server-22.04` if you don't have that [download](https://ubuntu.com/download/server) it or click install `later`
+    - Then move to finish
+    - Then click on your VM machine and its settings
+
+        ![VM-setting.png](../image/Hyper-V/VM-setting.png)
+    - select `Memory` and choose virtual memory for vm as much as needed
+    - Then `Processor` and choose virtual processors
+    - then `IDE Controller 1` if you previously not selected the `iso` file.
 
 
 
-  ### Kernal Update
+  ### Kernel Update
     - [wsl2 kernel update](https://learn.microsoft.com/en-us/windows/wsl/install-manual)
     - start from step-4 `Download the latest package`
     - step-5 in powershell OR CMD
