@@ -92,29 +92,63 @@ mkdir -p ${APP_DIR} && mkdir -p ${APP_DIR}/log && cd ${APP_DIR} && python3 -m ve
 - Create main.py
     ```bash
     echo "
+    import env_file_reader
+    from fastapi import FastAPI, HTTPException, Request
     import uvicorn
-    from fastapi import FastAPI
+    import os
+    import socket
+    from routes.auth import router as setup_router
+    from contextlib import asynccontextmanager
+    from db_conn import init_db
 
-    app = FastAPI()
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        await init_db()
+        yield
 
+    app = FastAPI(lifespan=lifespan)
 
-    @app.route('/')
-    async def hello_world():  # put application's code here
-    return 'Hello World!'
+    @app.exception_handler(HTTPException)
+    async def custom_http_exception_handler(request: Request, exc: HTTPException):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={\"error\": exc.detail},
+        )
 
+    app.include_router(setup_router)
+
+    # Get the current machine's hostname
+    hostname = socket.gethostname()
+
+    # Get the current machine's IP address
+    ip_address = socket.gethostbyname(hostname)
 
     if __name__ == '__main__':
+    print(f\"Server is running on: http://{ip_address}:{PORT}/docs\")
     uvicorn.run(
         'main:app',
         host='0.0.0.0',
-        port=8080,
+        port=int(os.environ.get('PORT')),
         reload=True
     )" | tee ${APP_DIR}/main.py >/dev/null
     ```
 
 -   .env file
     ```bash
+    echo "
     APP_DOMAIN=${APP_NAME}
+    PORT=8000
+    " | tee ${APP_DIR}/.env >/dev/null
+    ```
+-   ```bash
+    mkdir ${APP_DIR}/routes
+    ```
+-   .env.example file
+    ```bash
+    echo "
+    APP_DOMAIN=${APP_NAME}
+    PORT=8000
+    " | tee ${APP_DIR}/.env.example >/dev/null
     ```
 
 -   Make a service file
