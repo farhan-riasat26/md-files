@@ -141,7 +141,7 @@ mkdir -p ${APP_DIR} && mkdir -p ${APP_DIR}/log && cd ${APP_DIR} && python3 -m ve
     " | tee ${APP_DIR}/.env >/dev/null
     ```
 -   ```bash
-    mkdir ${APP_DIR}/routes
+    mkdir -p ${APP_DIR}/routes ${APP_DIR}/scheme
     ```
 -   .env.example file
     ```bash

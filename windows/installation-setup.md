@@ -29,6 +29,12 @@
     - [ ] [Host File Editor](https://hostsfileeditor.com/)
     - [ ] [Postman](https://www.postman.com/)
     - [ ] [Winrar](https://www.win-rar.com/start.html?&L=0)
+    - [ ] [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+    - [ ] [Microsoft Office](https://gravesoft.dev/)
+    - [ ] [Microsoft Office and windows Activation](https://github.com/massgravel/Microsoft-Activation-Scripts)
+    - [ ] [Node JS (windows)](https://github.com/coreybutler/nvm-windows)
+    - [ ] [Node JS (Linux)](https://github.com/nvm-sh/nvm)
+    - [ ] [Python (Windows)](https://www.digitalocean.com/community/tutorials/install-python-windows-10)
 
   ### Git Installation
     - During installation make sure to select `Use Notepad++ as default editor` and `Use Git from Git Bash only`
@@ -132,7 +138,7 @@
     - Choose Distribution `Name` you want to install in our case `Ubuntu-22.04`. Run following command to install
 
         ```bash
-        wsl --install Ubuntu-22.04
+        wsl --install -d Ubuntu-22.04
         ```
 
     - For further guidance use `wsl --help`
