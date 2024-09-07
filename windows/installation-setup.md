@@ -143,5 +143,39 @@
 
     - For further guidance use `wsl --help`
     - After complete installation, setup its `username` and `password`
+    - In `Instructions` folder there are .sh files
+    - open wsl and run commands
 
+        ```bash
+        sudo /mnt/d/Extras/Instructions/general_wsl_setup_dev_env.sh -w
+        ```
+        ```bash
+        sudo /mnt/d/Extras/Instructions/general_wsl_setup_dev_env.sh -cp
+        ```
+    - Open cmd
+        ```bash
+        wsl --shutdown
+        ```
 
+    - Open wsl and in `.ssh` and change file permissions
+        ```bash
+        chmod 0600 id_rsa
+        chmod 0644 id_rsa.pub
+        ```
+     - Set git username
+        ```bash
+        nano .gitconfig
+        ```
+    - Set for windows
+        ```bash
+        sudo cp .gitconfig /c/Users/windows_username
+        ```
+
+  ### VS CODE Setup
+    - Run the bat file from cmd or double click on it
+
+        ```cmd
+        install_vscode_ext.bat
+        ```
+        from `/Instructions/vscode` <span style="color: red;">**wait until it's done**.</span>
+        
