@@ -41,6 +41,12 @@
     certbot certonly --agree-tos --email faree.one5@gmail.com --no-eff-email --renew-by-default --manual --manual-auth-hook /etc/letsencrypt/custom-hooks/acme-dns-auth.py --preferred-challenges dns --debug-challenges -d dogs-collar.com -d *.domain-name
     ```
 
+- Delete SSL
+
+    ```bash
+    certbot delete --cert-name db.codescraft.co
+    ```
+
 ## Reference
 - https://github.com/joohoi/acme-dns-certbot-joohoi
 - https://roadmap.sh/guides/setup-and-auto-renew-ssl-certificates
