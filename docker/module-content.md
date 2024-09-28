@@ -1,4 +1,37 @@
 # Images
+- To list down all images
+    ```bash
+    docker images
+    ```
+- To inspection the image
+
+    ```bash
+    docker image inspect image_id
+    ```
+- To name the images (`-t`) there are 1 parameters seprated with `:` name which means repo and tag which identify the versioning
+
+    ```bash
+    docker build -t name:tag .
+    ```
+    - this command is used to create an image along with name and tag
+
+- To rename the image use
+
+    ```bash
+    docker tag old_name:old:tag new_name:new_tag
+    ```
+    - This makes a clone of old image
+
+- `rmi` flag is used to remove images
+    ```bash
+    docker rmi image_hash
+    ```
+
+- to delete all images
+
+    ```bash
+    docker image prune -a
+    ```
 # Containers
 ## Simple Definition:
 - Container is snapshot of an image.
@@ -40,3 +73,59 @@
     ```
   To check all containers use `-a` flag it shows you all containers weather it is in run or stop state
 
+- To run the new container
+
+    ```bash
+    docker run image_name/image_id
+    ```
+- Run the stop one
+
+    ```bash
+    docker start container_name
+    ```
+    - By Default run is in attach mode and start is in detach mode
+    - `-a` for attach mode and `-d` for detach
+
+- <span style="color: red;">Remember</span> using this command you can't able to ping the project because you have to map the docker port with local port
+
+    ```bash
+    docker run -p local_port:docker_port image_name/image_id
+    docker start -p local_port:docker_port container_name
+    ```
+    - **-d** used of detach mode.
+
+- After detach mode you can't see the logs or prints by using
+
+    ```bash
+    docker attach container_name
+    ```
+
+- For checking previous logs using
+    ```bash
+    docker logs container_name
+    ```
+
+- Some Times we want to interact our docker container `-i` flag is used for that and If I want to interact with terminal `-t` flag is used we can combine them `-it`
+- `rm` flag for removing container running container can not be removed. if we give rm flag with start command it deletes that container when It stopped (`--rm`)
+
+- `cp` flag is to copy files into container or from container
+
+    ```bash
+    docker cp source_file/path/folder container_name:destination_path
+    ```
+    - This copy files into docker container
+
+    ```bash
+    docker cp container_name:source_file_path local_folder/destination
+    ```
+
+- Named the docker container
+
+    ```bash
+    docker run -p local_port:image_port -d --rm --name container_custom_name image_id
+    ```
+- Named the volume of docker container
+
+    ```bash
+    docker run -p local_port:image_port -d --rm --name container_custom_name -v name_volume:/path-to-be-mount image_id
+    ```
